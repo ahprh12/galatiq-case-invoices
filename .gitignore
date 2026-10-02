@@ -1,2 +1,45 @@
+# Byte-compiled / optimized / AST items
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual Environment
 .venv/
+venv/
+ENV/
+env/
+
+# Environment secrets & credentials
 .env
+.env.*
+!.env.example
+
+# Local SQLite databases & SQLite journals
+*.db
+*.sqlite
+*.sqlite3
+*.db-journal
+*.db-wal
+*.db-shm
+data/*.db
+
+# Temporary / testing outputs & logs
+*.log
+audit/
+output/
+tmp/
+
+# Testing & Coverage
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Editor / IDE artifacts
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# OS-specific clutter
+.DS_Store
+Thumbs.db
