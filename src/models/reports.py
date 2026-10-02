@@ -3,9 +3,9 @@ from pydantic import BaseModel
 
 class ItemValidation(BaseModel):
     item: str
-    requested: int
-    available: Optional[int]
-    status: str  # PASS, INSUFFICIENT_STOCK, UNKNOWN_ITEM, INVALID_DATA, OUT_OF_STOCK
+    billed_qty: int
+    received_qty: Optional[int]
+    status: str  # PASS, OVERBILLED, NOT_RECEIVED, INVALID_DATA
     reason: Optional[str] = None
 
 class ValidationReport(BaseModel):

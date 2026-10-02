@@ -3,17 +3,17 @@ import os
 from typing import List, Dict
 from src.models import InvoiceData, ItemValidation, ValidationReport
 
-class InventoryValidator:
+class APReconciliationValidator:
     def __init__(self, db_path: str = os.path.join("data", "inventory.db")):
         self.db_path = db_path
 
-    def _fetch_stock_bulk(self, item_names: List[str]) -> Dict[str, int]:
-        """Bulk query to avoid N+1 query overhead."""
+    def _fetch_receipts_bulk(self, item_names: List[str]) -> Dict[str, int]:
+        """Bulk query against the receiving log to check physical deliveries."""
         if not item_names:
             return {}
 
         placeholders = ','.join('?' * len(item_names))
-        query = f"SELECT item, stock FROM inventory WHERE item IN ({placeholders})"
+        query = f"SELECT item, received_qty FROM receiving_log WHERE item IN ({placeholders})"
 
         with sqlite3.connect(self.db_path) as conn:
             cursor = conn.cursor()
@@ -22,7 +22,7 @@ class InventoryValidator:
 
     def validate(self, invoice: InvoiceData) -> ValidationReport:
         item_names = list({line.item for line in invoice.items})
-        stock_ledger = self._fetch_stock_bulk(item_names)
+        receiving_ledger = self._fetch_receipts_bulk(item_names)
 
         overall_valid = True
         item_reports = []
@@ -30,25 +30,22 @@ class InventoryValidator:
         for line in invoice.items:
             status = "PASS"
             reason = None
-            available = stock_ledger.get(line.item)
+            received = receiving_ledger.get(line.item)
 
             if line.quantity < 0:
-                status, reason = "INVALID_DATA", f"Negative quantity requested ({line.quantity})."
+                status, reason = "INVALID_DATA", f"Negative quantity billed ({line.quantity})."
                 overall_valid = False
-            elif available is None:
-                status, reason = "UNKNOWN_ITEM", "Item not found in master inventory."
+            elif received is None or received == 0:
+                status, reason = "NOT_RECEIVED", "Item was never received at the warehouse."
                 overall_valid = False
-            elif available == 0:
-                status, reason = "OUT_OF_STOCK", "Item is completely out of stock."
-                overall_valid = False
-            elif line.quantity > available:
-                status, reason = "INSUFFICIENT_STOCK", f"Requested {line.quantity}, but only {available} available."
+            elif line.quantity > received:
+                status, reason = "OVERBILLED", f"Vendor billed for {line.quantity}, but only {received} were received."
                 overall_valid = False
 
             item_reports.append(ItemValidation(
                 item=line.item,
-                requested=line.quantity,
-                available=available,
+                billed_qty=line.quantity,
+                received_qty=received,
                 status=status,
                 reason=reason
             ))
