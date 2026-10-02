@@ -14,20 +14,24 @@ def run_pipeline(invoice_path: str):
     extractor = ExtractionAgent()
     try:
         invoice_data = extractor.extract_invoice(invoice_path)
-        print(f"  • Extracted Vendor: {invoice_data.vendor}")
-        print(f"  • Total Amount:    ${invoice_data.amount:,.2f}")
-        print(f"  • Due Date:        {invoice_data.due_date}")
-        print(f"  • Items Count:     {len(invoice_data.items)}")
+        print(f"  • Extracted Invoice ID: {invoice_data.invoice_id}")
+        print(f"  • Extracted Vendor:     {invoice_data.vendor}")
+        print(f"  • Total Amount:        ${invoice_data.amount:,.2f}")
+        print(f"  • Due Date:            {invoice_data.due_date}")
+        print(f"  • Items Count:         {len(invoice_data.items)}")
     except Exception as e:
         print(f"❌ Stage 1 Extraction Failed: {e}")
         sys.exit(1)
 
-    # --- Stage 2: AP Reconciliation (3-Way Match) ---
-    print("\n[Stage 2] Reconciling against Receiving Log (3-Way Match)...")
+    # --- Stage 2: AP Reconciliation & Audit History ---
+    print("\n[Stage 2] Reconciling against Receiving Log & Audit History...")
     validator = APReconciliationValidator()
     validation_report = validator.validate(invoice_data)
 
     print(f"  • Validation Status: {'VALID' if validation_report.is_valid else 'INVALID'}")
+    if validation_report.is_duplicate:
+        print(f"  • DUPLICATE DETECTED: Invoice ID {validation_report.invoice_id} has already been processed.")
+        
     for item in validation_report.item_reports:
         mark = "✓" if item.status == "PASS" else "✗"
         reason = f" - {item.reason}" if item.reason else ""

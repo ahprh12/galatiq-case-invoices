@@ -6,7 +6,8 @@ class LineItem(BaseModel):
     quantity: int
 
 class InvoiceData(BaseModel):
+    invoice_id: str
     vendor: str
     amount: float
-    items: List[LineItem]
     due_date: str
+    items: List[LineItem]

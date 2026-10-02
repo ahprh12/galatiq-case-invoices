@@ -35,7 +35,10 @@ class ExtractionAgent:
                             "content": (
                                 "You are a precise data extraction agent. Extract invoice data "
                                 f"into a JSON object matching this schema: {json.dumps(schema_json)}. "
-                                "Output ONLY valid JSON."
+                                "CRUCIAL INSTRUCTIONS: "
+                                "1. Locate the exact Invoice Number or ID. If an explicit invoice number is missing, "
+                                "create a fallback ID by combining the vendor name and date (e.g., 'VENDOR-YYYYMMDD'). "
+                                "2. Output ONLY valid JSON."
                             ),
                         },
                         {"role": "user", "content": f"Invoice Content:\n{raw_text}"},

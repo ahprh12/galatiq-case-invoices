@@ -5,10 +5,12 @@ class ItemValidation(BaseModel):
     item: str
     billed_qty: int
     received_qty: Optional[int]
-    status: str  # PASS, OVERBILLED, NOT_RECEIVED, INVALID_DATA
+    status: str 
     reason: Optional[str] = None
 
 class ValidationReport(BaseModel):
+    invoice_id: str          
+    is_duplicate: bool       
     vendor: str
     amount: float
     is_valid: bool
