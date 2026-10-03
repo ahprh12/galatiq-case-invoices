@@ -6,12 +6,11 @@ OVERVIEW
 This doc outlines the business test cases used to evaluate the 
 automated invoice processing system. 
 The system acts as a digital Accounts Payable department: 
-- it reads vendor bills/invoices,
+- it reads vendor bills/invoices
 - extracts and transforms relevant data into structured JSON
-- verifies the data against the warehouse receiving logs (ensuring we only pay for what 
-actually arrived)
-- checks spending limits, 
-- decides whether to approve, reject, or escalate each invoice.
+- verifies the data against the warehouse receiving logs (ensuring we only pay for what actually arrived)
+- checks spending limits
+- decides whether to approve, reject, or escalate each invoice
 
 ----------------------------------------------------------------------
 1. STANDARD APPROVED ORDERS (Clean BAU)
@@ -90,7 +89,7 @@ actually arrived)
   invoice_1005.json, invoice_1013.json
 
 ----------------------------------------------------------------------
-7. MULTI-FORMAT CONSISTENCY (Format Independence)
+7. MULTI-FORMAT CONSISTENCY (See Duplicate Invoice test case below)
 ----------------------------------------------------------------------
 • What happens:
   The exact same invoice information is sent across different file 
@@ -101,4 +100,17 @@ actually arrived)
   the document is a PDF, CSV, JSON, XML, or plain text file.
 • Example Files Tested: 
   invoice_1011 (.pdf and .txt), invoice_1012 (.pdf and .txt)
+
+----------------------------------------------------------------------
+8. DUPLICATE INVOICE PREVENTION (Double-Billing Check)
+----------------------------------------------------------------------
+• What happens:
+  A vendor submits an invoice containing an Invoice ID that the system 
+  has already successfully processed and paid during a previous run.
+• Expected System Decision: 
+  REJECTED. The system checks the audit ledger, detects the matching 
+  Invoice ID, flags the submission as a "DUPLICATE", and automatically 
+  terminates the workflow to prevent double-paying the vendor.
+• Example Files Tested: 
+  invoice_1001.txt (processed twice in succession)
 ======================================================================

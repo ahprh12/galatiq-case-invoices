@@ -3,6 +3,7 @@ import sys
 from src.ingestion.extractor import ExtractionAgent
 from src.validation.validator import APReconciliationValidator
 from src.approval.reviewer import ApprovalAgent
+from src.execution.payment import ExecutionAgent # NEW: Import the Execution Agent
 
 def run_pipeline(invoice_path: str):
     print("=" * 60)
@@ -54,6 +55,14 @@ def run_pipeline(invoice_path: str):
     if decision.rejection_reasons:
         print(f"  • Rejection Reasons: {decision.rejection_reasons}")
     print(f"  • Executive Notes:   {decision.decision_notes}")
+    
+    # --- Stage 4: Execution & Payment ---
+    print("\n[Stage 4] Execution & Ledger Update...")
+    executor = ExecutionAgent()
+    executor.execute(invoice_data, decision)
+    
+    print("=" * 60)
+    print("🎉 Pipeline Complete.")
     print("=" * 60)
 
     return invoice_data, validation_report, decision
