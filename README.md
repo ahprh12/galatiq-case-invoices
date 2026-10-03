@@ -14,7 +14,7 @@ Get the interactive multi-agent dashboard running locally in four steps without 
 ### Step 1: Clone the Repository
 Open your terminal and clone the repository to your local machine:
 ```bash
-git clone [https://github.com/](https://github.com/)<your-username>/<your-repo-name>.git
+git clone <>
 cd <your-repo-name>
 ```
 
@@ -22,11 +22,10 @@ cd <your-repo-name>
 Create a .env file in the project root to securely store your API credentials:
 ```bash
 cp .env.example .env
-Open .env in any text editor and insert your key:
 ```
 
+Open .env in any text editor and insert your key:
 ```
-Code snippet
 GEMINI_API_KEY=your_actual_gemini_api_key_here
 ```
 
@@ -65,7 +64,7 @@ Execute the Pipeline: Click the "🚀 Process Invoice" button.
 
 Inspect Multi-Agent Execution: Watch the live status progression across Ingestion, 3-Way Match Ledger Validation, VP Critique Review, and Mock Payment Settlement.
 
-- Aakash
+Always open to constructive feedback, Aakash.
 
 ## Background
 
