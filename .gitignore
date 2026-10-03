@@ -28,6 +28,11 @@ data/*.db
 audit/
 output/
 tmp/
+data/temp_uploads/
+
+# Observability JSONL logs
+*.jsonl
+data/*.jsonl
 
 # Testing & Coverage
 .pytest_cache/

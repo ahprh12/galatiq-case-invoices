@@ -1,4 +1,71 @@
-# Galatiq Case: Invoice Processing Automation
+# Galatiq Case: Aakash's Proposal
+
+## Quick Start: One-Click Local Web Dashboard
+
+Get the interactive multi-agent dashboard running locally in four steps without manual virtual environment configuration or database seeding.
+
+### Prerequisites
+- **Python 3.10+** installed
+- A **Gemini API Key** (available free from [Google AI Studio](https://aistudio.google.com/))
+- or just ask Aakash and maybe he'll share his if he's in a good mood >:D
+
+---
+
+### Step 1: Clone the Repository
+Open your terminal and clone the repository to your local machine:
+```bash
+git clone [https://github.com/](https://github.com/)<your-username>/<your-repo-name>.git
+cd <your-repo-name>
+```
+
+### Step 2: Configure Your API Key
+Create a .env file in the project root to securely store your API credentials:
+```bash
+cp .env.example .env
+Open .env in any text editor and insert your key:
+```
+
+```
+Code snippet
+GEMINI_API_KEY=your_actual_gemini_api_key_here
+```
+
+### Step 3: Run the One-Click Launcher
+You can launch the application via either terminal or graphical desktop:
+
+Option A: Run via Terminal (Recommended)
+Run the automated launcher script from your terminal:
+
+```bash
+./run_ui.sh
+```
+
+Option B: Launch by Double-Clicking (Desktop GUI)
+Open your operating system's file manager (Files, Finder, or Explorer) and navigate into the project folder.
+
+Ensure the script has execute permissions (run chmod +x run_ui.sh once if prompted).
+
+Double-click run_ui.sh and select Run (or Run in Terminal).
+
+What Happens Automatically
+When run_ui.sh executes, it performs all setup steps without manual intervention:
+
+Virtual Environment: Detects or creates an isolated .venv environment and activates it.
+
+Dependencies: Automatically verifies and installs all required packages from requirements.txt.
+
+Database Initialization: Runs src/validation/db_setup.py to create and seed data/inventory.db if it does not already exist.
+
+App Launch: Starts the Streamlit dashboard and automatically opens your default web browser to http://localhost:8501.
+
+Using the Visual Interface
+Choose an Invoice: Pick any preloaded sample invoice from the dropdown (PDF, TXT, JSON, CSV, XML) or upload a custom invoice file.
+
+Execute the Pipeline: Click the "🚀 Process Invoice" button.
+
+Inspect Multi-Agent Execution: Watch the live status progression across Ingestion, 3-Way Match Ledger Validation, VP Critique Review, and Mock Payment Settlement.
+
+- Aakash
 
 ## Background
 
