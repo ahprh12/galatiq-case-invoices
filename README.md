@@ -30,16 +30,12 @@ GEMINI_API_KEY=your_actual_gemini_api_key_here
 ```
 
 ### Step 3: Run the One-Click Launcher
-You can launch the application via either terminal or graphical desktop:
 
-Option A: Run via Terminal (Recommended)
-Run the automated launcher script from your terminal:
-
+#### Run this command via Terminal (Recommended)
 ```bash
 ./run_ui.sh
 ```
-
-# Alternate Option: Launch by Double-Clicking (Desktop GUI)
+#### Alternate Option: Launch by Double-Clicking (Desktop GUI)
 - Open your operating system's file manager (Files, Finder, or Explorer) and navigate into the project folder
 - Ensure the script has execute permissions (run chmod +x run_ui.sh once if prompted)
 - Double-click run_ui.sh and select Run (or Run in Terminal)
