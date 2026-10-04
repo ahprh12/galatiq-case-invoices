@@ -29,11 +29,17 @@ Open .env in any text editor and insert your key, or propose an interesting trad
 GEMINI_API_KEY=your_actual_gemini_api_key_here
 ```
 
-### Step 3: Run the One-Click Launcher
+### Step 3: Running the System
 
-#### Run this command via Terminal (Recommended)
+#### One Click GUI Launcher via Terminal (Recommended)
 ```bash
+# Give it a minute to perform the initial setup
 ./run_ui.sh
+```
+#### Run Per Assignment Instructions
+```bash
+python -m venv .venv && source .venv/bin/activate && pip install --upgrade pip && pip install -r requirements.txt && python -m src.validation.db_setup
+python main.py --invoice_path=data/invoices/invoice1.txt
 ```
 #### Alternate Option: Launch by Double-Clicking (Desktop GUI)
 - Open your operating system's file manager (Files, Finder, or Explorer) and navigate into the project folder
