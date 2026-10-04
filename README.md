@@ -38,7 +38,9 @@ GEMINI_API_KEY=your_actual_gemini_api_key_here
 ```
 #### Option B: Run Per Assignment Instructions
 ```bash
+# Chained one-liner set up command
 python -m venv .venv && source .venv/bin/activate && pip install --upgrade pip && pip install -r requirements.txt && python -m src.validation.db_setup
+# Run exactly as the instructions state
 python main.py --invoice_path=data/invoices/invoice1.txt
 ```
 #### Option C: Launch by Double-Clicking (Desktop GUI)
