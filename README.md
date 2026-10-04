@@ -1,5 +1,5 @@
-# Galatiq Case: Aakash's Proposal
-
+# Galatiq Acme Corp Case: Aakash's Proposal
+⚠️ **NOTE:** Please read my [ASSUMPTIONS](docs/ASSUMPTIONS.md)!
 ## Quick Start: One-Click Local Web Dashboard
 
 Get the interactive multi-agent dashboard running locally in four steps without manual virtual environment configuration or database seeding.
@@ -7,7 +7,7 @@ Get the interactive multi-agent dashboard running locally in four steps without 
 ### Prerequisites
 - **Python 3.10+** installed
 - A **Gemini API Key** (available free from [Google AI Studio](https://aistudio.google.com/))
-- **or just ask Aakash and maybe he'll share his if he's in a good mood >:D**
+    - or just ask Aakash and maybe he'll share his if he's in a good mood >:D
 
 ---
 
