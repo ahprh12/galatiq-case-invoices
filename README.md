@@ -60,7 +60,10 @@ python main.py --invoice_path=data/invoices/invoice1.txt
 
 **3.)** Inspect Multi-Agent Execution: Watch the live status progression across Ingestion, 3-Way Match Ledger Validation, VP Critique Review, and Mock Payment Settlement.
 
+
 *Enjoy. I'm always open to constructive feedback, Aakash.*
+
+==========================================================
 
 ## Background
 
