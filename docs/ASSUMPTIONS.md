@@ -1,24 +1,21 @@
-Assumptions for the assignment - Aakash.
+# Architectural & Business Assumptions — Acme Corp AP Automation Pipeline
 
-1. Domain & Accounting Assumptions
-Receiving Log as "Unbilled Receipts": The database table receiving_log does not represent total historical warehouse stock or total lifetime physical inventory; it models an active "Unbilled Receipts" clearing account (goods physically delivered and verified at the warehouse that have not yet been matched to a bill).
+### 1. Domain & Accounting Assumptions (3-Way Match)
+* **Receiving Log as "Unbilled Receipts":** The database table `receiving_log` does not model total lifetime warehouse inventory; it models an active "Unbilled Receipts" clearing account (goods physically received and inspected at the dock that have not yet been settled against a vendor bill)
+* **Deterministic Dual-Thresholds:** A line item passes 3-Way Match validation if and only if the billed quantity is positive and less than or equal to the unbilled quantity currently recorded in `receiving_log`[cite: 14].
+* **Zero-Tolerance for Overbilling or Phantom Goods:** Any line item where the billed quantity exceeds the received quantity (`OVERBILLED`) or where the item does not exist or has 0 recorded receipts (`NOT_RECEIVED`) automatically fails validation and marks the entire invoice invalid[cite: 14].
+* **Positive Quantity Constraint:** Line items containing negative or zero quantities are treated as corrupted data (`INVALID_DATA`) and are rejected immediately before matching against the ledger[cite: 14].
 
-Deterministic Dual-Thresholds: A line item passes 3-Way Match validation if and only if the billed quantity is positive and less than or equal to the unbilled quantity currently recorded in receiving_log.
+### 2. Settlement Mutation & Deduplication Assumptions
+* **Atomic State Mutation (Post-Payment Settlement):** Upon successful approval and payment execution in Stage 4, the system atomically deducts billed quantities from `receiving_log` and commits the invoice ID to `processed_invoices`[cite: 14]. 
+* **Stateful Testing & DB Re-Seeding:** Because successful transactions deplete unbilled receipts to prevent double-invoicing, running multiple valid invoices in succession against the same items will deplete available receipts[cite: 14]. Testing environments must utilize the UI reset control (`🔄 Reset / Re-seed Inventory DB`) or `python -m src.validation.db_setup` to restore baseline stock between runs[cite: 14].
+* **Content-Extracted Identity:** The system assumes that an `invoice_id` must be extracted directly from the document payload by the LLM (with a deterministic fallback format like `VENDOR-YYYYMMDD` if an explicit number is absent), rather than relying on brittle file names[cite: 14].
+* **Deduplication Gate:** An incoming invoice matching an ID in `processed_invoices` is flagged as `is_duplicate = True` (`DUPLICATE`) and immediately halted before financial settlement[cite: 14].
 
-Zero-Tolerance for Overbilling or Phantom Goods: Any line item where the billed quantity exceeds the received quantity (OVERBILLED) or where the item does not exist or has 0 recorded receipts (NOT_RECEIVED) automatically fails the 3-Way Match and invalidates the entire invoice.
-
-Positive Quantity Constraint: Line items containing negative or zero quantities are treated as corrupted data (INVALID_DATA) and are rejected immediately before matching against the ledger.
-
-2. Deduplication & Identity Assumptions
-Content-Extracted Identity: The system assumes that an invoice_id can and must be extracted directly from the document payload by the LLM (with a deterministic fallback format like VENDOR-YYYYMMDD if an explicit number is absent), rather than relying on brittle file names.
-
-Audit Table Persistence: The processed_invoices table acts as a simple, durable ledger of previously completed invoices. An incoming invoice matching an ID in this table is flagged as is_duplicate = True and rejected before downstream financial processing.
-
-3. Pipeline & Orchestration Assumptions
-Decoupled Architecture: Ingestion/Extraction (Stage 1), Ledger Reconciliation (Stage 2), Policy Approval (Stage 3), and Payment Execution (Stage 4) are strictly decoupled. Stages communicate solely through strongly typed Pydantic contracts (InvoiceData, ValidationReport, ApprovalDecision).
-
-Deterministic Guardrails Precede LLM Critique: Business policy and math gates are hard deterministic rules (Python/SQL). An invoice that fails receiving reconciliation or deduplication cannot be approved by an LLM prompt hallucination.
-
-Separation of Authorization and Execution: The $10,000 threshold strictly routes invoices into REQUIRES_ELEVATED_APPROVAL (flagging requires_vp_review = True), reserving automatic APPROVED status only for clean invoices under $10,000.
-
-Isolated Testing Environment: Test suites operate on ephemeral, isolated SQLite databases (tmp_path) to ensure unit and regression tests never alter production data, with LLM calls mocked out to keep test execution fast, deterministic, and cost-free.
+### 3. Agentic Pipeline & Governance Assumptions
+* **Decoupled Architecture:** Ingestion/Extraction (Stage 1), Ledger Reconciliation (Stage 2), Policy Approval (Stage 3), and Payment Execution (Stage 4) are strictly decoupled[cite: 14]. Stages communicate solely through strongly typed Pydantic contracts (`InvoiceData`, `ValidationReport`, `ApprovalDecision`)[cite: 14].
+* **Native Tool-Calling Contracts:** Rather than relying on fuzzy raw-text generation, Stage 1 forces the LLM to call `submit_extracted_invoice`, and Stage 3 forces `record_approval_decision` using Pydantic JSON schemas as formal function parameters[cite: 14, 15].
+* **Multi-Attempt Self-Correction Loops:** If an LLM emits a schema violation or violates a hard corporate policy (e.g., attempting to auto-approve an invoice over $10,000), the deterministic wrapper captures the error and returns a corrective `role: tool` message to the model context, giving the agent up to 3 attempts to correct its output[cite: 14, 15].
+* **Separation of Authorization and Execution:** The $10,000 threshold strictly routes invoices into `REQUIRES_ELEVATED_APPROVAL` (flagging `requires_vp_review = True`), reserving automatic `APPROVED` status only for clean invoices under $10,000[cite: 14]. Payments cannot be initiated autonomously by the LLM; Stage 4 payment rails are strictly deterministic Python actions triggered only on an approved decision[cite: 14].
+* **Telemetry & Observability:** All raw prompts, tool calls, retry feedback traces, and validation outputs are appended to `data/llm_observability.jsonl` to ensure financial auditability without leaking secrets[cite: 14, 15].
+* **Ephemeral Test Isolation:** Test suites operate on isolated temporary SQLite databases (`tmp_path`) with mocked LLM completions to keep automated test suites deterministic, fast, and cost-free[cite: 14].
